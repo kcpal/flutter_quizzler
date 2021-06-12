@@ -46,29 +46,18 @@ class _QuizPageState extends State<QuizPage> {
 
   checkAnswers(bool userPickedAnswer) {
     bool correctAnswer = quizBrain.getCorrectAnswer();
-    if (quizBrain.isFinished()) {
-      Alert(
-        context: context,
-        type: AlertType.error,
-        title: "Finished!",
-        desc: "You have reached the end of the quiz.",
-        buttons: [
-          DialogButton(
-            child: Text(
-              "Cancel",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            onPressed: () => Navigator.pop(context),
-            width: 120,
-          )
-        ],
-      ).show();
-      setState(() {
+
+    setState(() {
+      if (quizBrain.isFinished()) {
+        Alert(
+          context: context,
+          title: 'Finished!',
+          desc: 'You\'ve reached the end of the quiz.',
+        ).show();
+
         quizBrain.reset();
         scoreKeeper = [];
-      });
-    } else {
-      setState(() {
+      } else {
         if (userPickedAnswer == correctAnswer) {
           scoreKeeper.add(Icon(
             Icons.check,
@@ -82,8 +71,8 @@ class _QuizPageState extends State<QuizPage> {
         }
 
         quizBrain.nextQuestion();
-      });
-    }
+      }
+    });
   }
 
   @override
