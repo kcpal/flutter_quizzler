@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:quizzler/quiz_brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
+QuizBrain quizBrain = QuizBrain();
 
 void main() => runApp(Quizzler());
 
@@ -25,6 +29,63 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  List<Icon> scoreKeeper = [];
+/*
+  List<String> questions = [
+    'You can lead a cow down stairs but not up stairs.',
+    'Approximately one quarter of human bones are in the feet.',
+    'A slug\'s blood is green.'
+  ];
+
+  List<bool> answers = [false, true, true];
+
+  Question q1 = Question(
+      q: 'You can lead a cow down stairs but not up stairs.', a: false);
+
+  */
+
+  checkAnswers(bool userPickedAnswer) {
+    bool correctAnswer = quizBrain.getCorrectAnswer();
+    if (quizBrain.isFinished()) {
+      Alert(
+        context: context,
+        type: AlertType.error,
+        title: "Finished!",
+        desc: "You have reached the end of the quiz.",
+        buttons: [
+          DialogButton(
+            child: Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+            width: 120,
+          )
+        ],
+      ).show();
+      setState(() {
+        quizBrain.reset();
+        scoreKeeper = [];
+      });
+    } else {
+      setState(() {
+        if (userPickedAnswer == correctAnswer) {
+          scoreKeeper.add(Icon(
+            Icons.check,
+            color: Colors.green,
+          ));
+        } else {
+          scoreKeeper.add(Icon(
+            Icons.close,
+            color: Colors.red,
+          ));
+        }
+
+        quizBrain.nextQuestion();
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,7 +98,7 @@ class _QuizPageState extends State<QuizPage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -61,7 +122,7 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked true.
+                checkAnswers(true);
               },
             ),
           ),
@@ -79,12 +140,30 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               onPressed: () {
-                //The user picked false.
+                checkAnswers(false);
+                // bool correctAnswer = quizBrain.getCorrectAnswer();
+                // if (correctAnswer == true) {
+                //   print('User got right');
+                // } else {
+                //   print("user got wrong");
+                // }
+                // setState(() {
+                //   quizBrain.nextQuestion();
+                //   // questionNumber++;
+                //   // scoreKeeper.add(
+                //   //   Icon(
+                //   //     Icons.close,
+                //   //     color: Colors.red,
+                //   //   ),
+                //   // );
+                // });
               },
             ),
           ),
         ),
-        //TODO: Add a Row here as your score keeper
+        Row(
+          children: scoreKeeper,
+        )
       ],
     );
   }
